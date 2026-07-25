@@ -191,9 +191,6 @@ app.post('/api/billing/subscribe', requireAuth, ah(async (req, res) => {
       const customer = await asaas.createCustomer({ name: user.nome || user.email, email: user.email, cpfCnpj });
       customerId = customer.id;
       await db.run('UPDATE users SET asaas_customer_id = $1 WHERE id = $2', [customerId, user.id]);
-    } else {
-      // cliente Asaas ja existia (ex: tentativa anterior) — garante que o CPF/CNPJ esteja preenchido nele
-      await asaas.updateCustomerCpfCnpj(customerId, cpfCnpj);
     }
     const subscription = await asaas.createSubscription(customerId);
     await db.run('UPDATE users SET asaas_subscription_id = $1 WHERE id = $2', [subscription.id, user.id]);

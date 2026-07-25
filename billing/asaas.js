@@ -46,16 +46,6 @@ async function createCustomer({ name, email, cpfCnpj }) {
   });
 }
 
-// Garante que um cliente ja existente no Asaas tenha o CPF/CNPJ preenchido
-// (necessario para criar cobrancas; clientes criados antes dessa validacao
-// podem ter ficado sem esse dado).
-async function updateCustomerCpfCnpj(customerId, cpfCnpj) {
-  return asaasFetch('/customers/' + encodeURIComponent(customerId), {
-    method: 'PUT',
-    body: JSON.stringify({ cpfCnpj }),
-  });
-}
-
 function nextDueDateISO(daysFromNow = 1) {
   const d = new Date();
   d.setDate(d.getDate() + daysFromNow);
@@ -101,6 +91,6 @@ const ACTIVE_EVENTS = new Set(['PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED']);
 const INACTIVE_EVENTS = new Set(['PAYMENT_OVERDUE', 'PAYMENT_DELETED', 'PAYMENT_REFUNDED', 'SUBSCRIPTION_DELETED']);
 
 module.exports = {
-  isConfigured, createCustomer, updateCustomerCpfCnpj, createSubscription, getCheckoutUrlForSubscription,
+  isConfigured, createCustomer, createSubscription, getCheckoutUrlForSubscription,
   verifyWebhookToken, ACTIVE_EVENTS, INACTIVE_EVENTS, PLAN_VALUE, PLAN_NAME,
 };
