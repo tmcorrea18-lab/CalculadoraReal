@@ -1,11 +1,14 @@
 # Lucro Real — versão SaaS (Netlify)
 
 Calculadora de precificação para e-commerce como produto de verdade:
-cadastro, login, 7 dias de teste grátis, assinatura mensal recorrente via
-Asaas (Pix, boleto ou cartão) e histórico salvo na nuvem por usuário. A
-calculadora só é entregue depois que o servidor confirma login válido E
-assinatura ativa (ou trial). Sem isso, ninguém vê o app — não tem link fixo
-pra compartilhar.
+cadastro, login, assinatura mensal recorrente via Asaas (Pix, boleto ou
+cartão) e histórico salvo na nuvem por usuário. Por padrão NÃO tem teste
+grátis: o cliente cria a conta e cai direto na tela de pagamento — só entra
+na calculadora depois que o Asaas confirma o pagamento. (Se quiser reativar
+um período de teste, é só mudar `TRIAL_DAYS` para um valor maior que 0 nas
+variáveis de ambiente — o código já suporta os dois modos.) A calculadora só
+é entregue depois que o servidor confirma login válido E assinatura ativa.
+Sem isso, ninguém vê o app — não tem link fixo pra compartilhar.
 
 Esta versão roda como **Netlify Functions** (serverless) com banco de dados
 **Postgres** (em vez do SQLite em arquivo, que não sobrevive em ambiente

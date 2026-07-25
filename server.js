@@ -17,7 +17,7 @@ const asaas = require('./billing/asaas');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const TRIAL_DAYS = Number(process.env.TRIAL_DAYS || '7');
+const TRIAL_DAYS = Number(process.env.TRIAL_DAYS || '0'); // 0 = sem teste gratis, cliente paga antes de acessar
 
 // Encapsula um handler async para que erros caiam no error handler do Express
 // em vez de derrubar a funcao serverless com uma promise rejeitada sem tratamento.
@@ -49,7 +49,8 @@ app.post('/api/auth/register', ah(async (req, res) => {
   if (existing) return res.status(409).json({ error: 'Ja existe uma conta com esse e-mail.' });
 
   const id = newId('u');
-  const trialEndsAt = new Date(Date.now() + TRIAL_DAYS * 86400000).toISOString();
+  // TRIAL_DAYS=0 (padrao): sem teste gratis, o acesso so libera apos o pagamento confirmar via webhook.
+  const trialEndsAt = TRIAL_DAYS > 0 ? new Date(Date.now() + TRIAL_DAYS * 86400000).toISOString() : null;
   await db.run(
     `INSERT INTO users (id, email, password_hash, nome, trial_ends_at) VALUES ($1, $2, $3, $4, $5)`,
     [id, emailNorm, hashPassword(password), nome || null, trialEndsAt]
@@ -79,7 +80,7 @@ app.get('/api/auth/me', ah(async (req, res) => {
   if (!userId) return res.status(401).json({ error: 'not_authenticated' });
   const user = await db.get('SELECT id, email, nome, subscription_status, trial_ends_at FROM users WHERE id = $1', [userId]);
   if (!user) return res.status(401).json({ error: 'not_authenticated' });
-  const trialActive = user.trial_ends_at && new Date(user.trial_ends_at) > new Date();
+  const trialActive = Boolean(user.trial_ends_at && new Date(user.trial_ends_at) > new Date());
   res.json({ ...user, trialActive, active: user.subscription_status === 'active' || trialActive });
 }));
 
@@ -160,7 +161,7 @@ app.put('/api/config', requireAuth, requireActiveSubscription(db), ah(async (req
 // ------------------------------------------------------------
 app.get('/api/billing/status', requireAuth, ah(async (req, res) => {
   const user = await db.get('SELECT subscription_status, trial_ends_at FROM users WHERE id = $1', [req.userId]);
-  const trialActive = user.trial_ends_at && new Date(user.trial_ends_at) > new Date();
+  const trialActive = Boolean(user.trial_ends_at && new Date(user.trial_ends_at) > new Date());
   res.json({
     configured: asaas.isConfigured(),
     status: user.subscription_status,
