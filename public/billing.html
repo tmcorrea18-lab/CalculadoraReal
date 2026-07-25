@@ -82,6 +82,11 @@ a:hover{text-decoration:underline}
       <li><span class="check">✓</span>Histórico salvo na nuvem</li>
       <li><span class="check">✓</span>Simulador e diagnóstico automático</li>
     </ul>
+    <div class="cpf-field" id="cpfField" style="display:none;text-align:left;margin-bottom:14px">
+      <label for="cpfCnpj" style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">CPF ou CNPJ (necessário para emitir a cobrança)</label>
+      <input type="text" id="cpfCnpj" placeholder="Somente números" inputmode="numeric" maxlength="18"
+        style="width:100%;padding:13px 14px;border-radius:11px;border:1px solid var(--border-strong);font-size:14px;font-family:inherit">
+    </div>
     <div class="error-box" id="errBox"></div>
     <button class="btn btn-primary" id="btnSubscribe">Pagar e liberar acesso</button>
     <div class="foot-link"><a href="/app" id="appLink" style="display:none">Ir para a calculadora</a></div>
@@ -109,17 +114,28 @@ async function load(){
     document.getElementById('errBox').textContent = 'A cobrança automática ainda está sendo configurada. Fale com o suporte para liberar seu acesso.';
     document.getElementById('errBox').classList.add('show');
     document.getElementById('btnSubscribe').disabled = true;
+  } else if(data.status!=='active' && !data.hasCpfCnpj){
+    document.getElementById('cpfField').style.display='block';
   }
 }
 document.getElementById('btnSubscribe').addEventListener('click', async ()=>{
   const btn = document.getElementById('btnSubscribe');
+  const cpfField = document.getElementById('cpfField');
+  const cpfCnpj = document.getElementById('cpfCnpj').value.replace(/\D/g,'');
+  if(cpfField.style.display!=='none' && cpfCnpj.length!==11 && cpfCnpj.length!==14){
+    const err = document.getElementById('errBox');
+    err.textContent = 'Informe um CPF (11 dígitos) ou CNPJ (14 dígitos) válido.';
+    err.classList.add('show');
+    return;
+  }
   btn.disabled = true; btn.textContent = 'Redirecionando...';
-  const r = await fetch('/api/billing/subscribe',{method:'POST',credentials:'include'});
+  const r = await fetch('/api/billing/subscribe',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({cpfCnpj})});
   const data = await r.json().catch(()=>({}));
   if(!r.ok || !data.checkoutUrl){
     const err = document.getElementById('errBox');
     err.textContent = data.error || 'Não foi possível iniciar a cobrança.';
     err.classList.add('show');
+    if(data.needsCpfCnpj) cpfField.style.display='block';
     btn.disabled = false; btn.textContent = 'Pagar e liberar acesso';
     return;
   }

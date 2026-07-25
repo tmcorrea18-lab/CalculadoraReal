@@ -160,7 +160,7 @@ app.put('/api/config', requireAuth, requireActiveSubscription(db), ah(async (req
 // BILLING (Asaas)
 // ------------------------------------------------------------
 app.get('/api/billing/status', requireAuth, ah(async (req, res) => {
-  const user = await db.get('SELECT subscription_status, trial_ends_at FROM users WHERE id = $1', [req.userId]);
+  const user = await db.get('SELECT subscription_status, trial_ends_at, cpf_cnpj FROM users WHERE id = $1', [req.userId]);
   const trialActive = Boolean(user.trial_ends_at && new Date(user.trial_ends_at) > new Date());
   res.json({
     configured: asaas.isConfigured(),
@@ -168,6 +168,7 @@ app.get('/api/billing/status', requireAuth, ah(async (req, res) => {
     trialActive,
     trialEndsAt: user.trial_ends_at,
     planValue: asaas.PLAN_VALUE,
+    hasCpfCnpj: Boolean(user.cpf_cnpj),
   });
 }));
 
@@ -175,11 +176,19 @@ app.post('/api/billing/subscribe', requireAuth, ah(async (req, res) => {
   if (!asaas.isConfigured()) {
     return res.status(503).json({ error: 'A cobrança ainda não foi configurada pelo administrador. Fale com o suporte.' });
   }
+  const cpfCnpjDigits = String((req.body && req.body.cpfCnpj) || '').replace(/\D/g, '');
   try {
     const user = await db.get('SELECT * FROM users WHERE id = $1', [req.userId]);
+    const cpfCnpj = user.cpf_cnpj || cpfCnpjDigits;
+    if (!cpfCnpj || (cpfCnpj.length !== 11 && cpfCnpj.length !== 14)) {
+      return res.status(400).json({ error: 'Informe um CPF ou CNPJ válido para gerar a cobrança.', needsCpfCnpj: true });
+    }
+    if (!user.cpf_cnpj) {
+      await db.run('UPDATE users SET cpf_cnpj = $1 WHERE id = $2', [cpfCnpj, user.id]);
+    }
     let customerId = user.asaas_customer_id;
     if (!customerId) {
-      const customer = await asaas.createCustomer({ name: user.nome || user.email, email: user.email });
+      const customer = await asaas.createCustomer({ name: user.nome || user.email, email: user.email, cpfCnpj });
       customerId = customer.id;
       await db.run('UPDATE users SET asaas_customer_id = $1 WHERE id = $2', [customerId, user.id]);
     }

@@ -39,10 +39,10 @@ async function asaasFetch(pathname, options = {}) {
   return body;
 }
 
-async function createCustomer({ name, email }) {
+async function createCustomer({ name, email, cpfCnpj }) {
   return asaasFetch('/customers', {
     method: 'POST',
-    body: JSON.stringify({ name, email }),
+    body: JSON.stringify({ name, email, cpfCnpj }),
   });
 }
 

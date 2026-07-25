@@ -39,6 +39,7 @@ async function migrate() {
       asaas_subscription_id TEXT,
       subscription_updated_at TIMESTAMPTZ
     );
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS cpf_cnpj TEXT;
 
     CREATE TABLE IF NOT EXISTS historico (
       id TEXT PRIMARY KEY,
