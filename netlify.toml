@@ -1,0 +1,31 @@
+[build]
+  command = "npm install"
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  external_node_modules = ["express", "pg", "bcryptjs", "jsonwebtoken", "cookie-parser", "dotenv"]
+  node_bundler = "esbuild"
+
+# As paginas publicas (index.html, login.html, register.html, billing.html,
+# shared.css) sao servidas direto da pasta public/ pelo CDN da Netlify —
+# mais rapido, sem passar pela funcao. So o que precisa de logica no servidor
+# (checar sessao, checar assinatura, ler/escrever no banco) vai pra funcao.
+
+[[redirects]]
+  force = true
+  from = "/api/*"
+  status = 200
+  to = "/.netlify/functions/server/:splat"
+
+[[redirects]]
+  force = true
+  from = "/app"
+  status = 200
+  to = "/.netlify/functions/server"
+
+[[redirects]]
+  force = true
+  from = "/healthz"
+  status = 200
+  to = "/.netlify/functions/server"

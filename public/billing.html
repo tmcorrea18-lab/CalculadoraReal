@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assinatura — Lucro Real</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="brand" href="/" style="text-decoration:none;color:var(--text)"><span class="brand-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l4 8 8 4-8 4-4 8-4-8-8-4 8-4z"/></svg></span>Lucro Real</a>
+  <div class="price-card">
+    <div id="statusPill" class="status-pill inactive" style="margin-bottom:16px">Carregando...</div>
+    <div style="font-size:13px;color:var(--text-2);font-weight:700">PLANO MENSAL</div>
+    <div class="amount" id="amount">R$ 29<span>/mês</span></div>
+    <ul>
+      <li>Calculadora completa de precificação</li>
+      <li>Comparador de canais</li>
+      <li>Histórico salvo na nuvem</li>
+      <li>Simulador e diagnóstico automático</li>
+    </ul>
+    <div class="error-box" id="errBox"></div>
+    <button class="btn btn-primary" id="btnSubscribe">Assinar agora</button>
+    <div class="foot-link"><a href="/app">Voltar para o app</a> · <a href="#" id="logoutLink">Sair</a></div>
+  </div>
+</div>
+<script>
+async function load(){
+  const r = await fetch('/api/billing/status',{credentials:'include'});
+  if(r.status===401){ location.href='/login.html'; return; }
+  const data = await r.json();
+  const pill = document.getElementById('statusPill');
+  document.getElementById('amount').innerHTML = 'R$ '+data.planValue.toFixed(2).replace('.',',')+'<span>/mês</span>';
+  if(data.status==='active'){
+    pill.className='status-pill active'; pill.textContent='Assinatura ativa';
+    document.getElementById('btnSubscribe').textContent='Assinatura ativa ✓';
+    document.getElementById('btnSubscribe').disabled = true;
+  } else if(data.trialActive){
+    pill.className='status-pill active'; pill.textContent='Em teste grátis';
+  } else {
+    pill.className='status-pill inactive'; pill.textContent='Assinatura inativa';
+  }
+  if(!data.configured){
+    document.getElementById('errBox').textContent = 'A cobrança automática ainda está sendo configurada. Fale com o suporte para liberar seu acesso.';
+    document.getElementById('errBox').classList.add('show');
+    document.getElementById('btnSubscribe').disabled = true;
+  }
+}
+document.getElementById('btnSubscribe').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btnSubscribe');
+  btn.disabled = true; btn.textContent = 'Redirecionando...';
+  const r = await fetch('/api/billing/subscribe',{method:'POST',credentials:'include'});
+  const data = await r.json().catch(()=>({}));
+  if(!r.ok || !data.checkoutUrl){
+    const err = document.getElementById('errBox');
+    err.textContent = data.error || 'Não foi possível iniciar a cobrança.';
+    err.classList.add('show');
+    btn.disabled = false; btn.textContent = 'Assinar agora';
+    return;
+  }
+  location.href = data.checkoutUrl;
+});
+document.getElementById('logoutLink').addEventListener('click', async (e)=>{
+  e.preventDefault();
+  await fetch('/api/auth/logout',{method:'POST',credentials:'include'});
+  location.href='/';
+});
+load();
+</script>
+</body>
+</html>

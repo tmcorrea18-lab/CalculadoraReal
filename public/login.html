@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — Lucro Real</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="brand" href="/" style="text-decoration:none;color:var(--text)"><span class="brand-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l4 8 8 4-8 4-4 8-4-8-8-4 8-4z"/></svg></span>Lucro Real</a>
+  <div class="card">
+    <h1>Entrar</h1>
+    <div class="sub">Acesse sua conta para continuar calculando.</div>
+    <div class="error-box" id="errBox"></div>
+    <form id="form">
+      <div class="field"><label>E-mail</label><input type="email" id="email" required autocomplete="email"></div>
+      <div class="field"><label>Senha</label><input type="password" id="password" required autocomplete="current-password"></div>
+      <button class="btn btn-primary" type="submit">Entrar</button>
+    </form>
+    <div class="foot-link">Ainda não tem conta? <a href="/register.html">Criar conta grátis</a></div>
+  </div>
+</div>
+<script>
+document.getElementById('form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const err = document.getElementById('errBox'); err.classList.remove('show');
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email,password})});
+  const data = await r.json().catch(()=>({}));
+  if(!r.ok){ err.textContent = data.error || 'Não foi possível entrar.'; err.classList.add('show'); return; }
+  location.href = '/app';
+});
+</script>
+</body>
+</html>

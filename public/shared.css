@@ -1,0 +1,56 @@
+:root[data-theme="light"]{
+  --bg:#F7F7F9; --card:#FFFFFF; --border:rgba(15,15,20,.08); --border-strong:rgba(15,15,20,.14);
+  --text:#131318; --text-2:#5C5C68; --text-3:#96969F;
+  --accent:#6C5CE7; --accent-2:#8B7CF6; --accent-soft:rgba(108,92,231,.10);
+  --success:#0EA968; --success-soft:rgba(14,169,104,.10);
+  --danger:#E5484D; --danger-soft:rgba(229,72,77,.10);
+  --warning:#D97706; --warning-soft:rgba(217,119,6,.10);
+  --shadow-md:0 4px 16px -4px rgba(15,15,20,.08), 0 1px 2px rgba(15,15,20,.04);
+  --shadow-lg:0 24px 64px -16px rgba(15,15,20,.20);
+}
+:root[data-theme="dark"]{
+  --bg:#08080A; --card:#131318; --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.14);
+  --text:#F4F4F6; --text-2:#A6A6B0; --text-3:#6C6C78;
+  --accent:#8B7CF6; --accent-2:#A78BFA; --accent-soft:rgba(139,124,246,.16);
+  --success:#34D399; --success-soft:rgba(52,211,153,.13);
+  --danger:#F87171; --danger-soft:rgba(248,113,113,.13);
+  --warning:#FBBF24; --warning-soft:rgba(251,191,36,.13);
+  --shadow-md:0 4px 20px -4px rgba(0,0,0,.5);
+  --shadow-lg:0 24px 70px -16px rgba(0,0,0,.7);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.font-display{font-family:'Manrope','Inter',sans-serif}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;margin-bottom:34px}
+.brand-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 14px -3px rgba(108,92,231,.55)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow-md);padding:34px;width:100%;max-width:400px}
+.card h1{font-family:'Manrope',sans-serif;font-size:21px;font-weight:800;margin-bottom:6px;letter-spacing:-.01em}
+.card .sub{color:var(--text-2);font-size:13.5px;margin-bottom:24px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.field label{font-size:12.5px;font-weight:600;color:var(--text-2)}
+.field input{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-size:14.5px;font-weight:600;color:var(--text);outline:none;transition:border-color .18s ease,box-shadow .18s ease}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700;border:none;cursor:pointer;width:100%;transition:transform .15s ease,box-shadow .2s ease}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 6px 20px -6px rgba(108,92,231,.55)}
+.btn-secondary{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+.foot-link{text-align:center;font-size:13px;color:var(--text-2);margin-top:18px}
+.error-box{background:var(--danger-soft);color:var(--danger);border-radius:11px;padding:11px 14px;font-size:13px;font-weight:600;margin-bottom:16px;display:none}
+.error-box.show{display:block}
+.hero{text-align:center;max-width:640px;margin-bottom:28px}
+.hero h1{font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(30px,5vw,46px);letter-spacing:-.03em;
+  background:linear-gradient(135deg,var(--text) 30%,var(--accent) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+.hero p{color:var(--text-2);font-size:16.5px;line-height:1.5}
+.price-card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow-lg);padding:36px;width:100%;max-width:380px;text-align:center}
+.price-card .amount{font-family:'Manrope',sans-serif;font-size:44px;font-weight:800;letter-spacing:-.02em;margin:10px 0 2px}
+.price-card .amount span{font-size:15px;color:var(--text-3);font-weight:600}
+.price-card ul{list-style:none;text-align:left;margin:22px 0;display:flex;flex-direction:column;gap:10px}
+.price-card li{font-size:13.5px;color:var(--text-2);display:flex;gap:9px;align-items:flex-start}
+.price-card li::before{content:'✓';color:var(--success);font-weight:800;flex-shrink:0}
+.badge-trial{display:inline-block;background:var(--success-soft);color:var(--success);font-size:12px;font-weight:700;padding:5px 12px;border-radius:99px;margin-bottom:18px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:99px}
+.status-pill.active{background:var(--success-soft);color:var(--success)}
+.status-pill.inactive{background:var(--warning-soft);color:var(--warning)}
