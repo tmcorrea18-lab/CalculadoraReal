@@ -13,7 +13,7 @@ const ASAAS_ENV = process.env.ASAAS_ENV || 'sandbox'; // 'sandbox' | 'production
 const BASE_URL = ASAAS_ENV === 'production'
   ? 'https://api.asaas.com/v3'
   : 'https://sandbox.asaas.com/api/v3';
-const PLAN_VALUE = Number(process.env.PLAN_VALUE_BRL || '29.00');
+const PLAN_VALUE = Number(process.env.PLAN_VALUE_BRL || '49.90');
 const PLAN_NAME = process.env.PLAN_NAME || 'Lucro Real — Assinatura mensal';
 
 function isConfigured() {
