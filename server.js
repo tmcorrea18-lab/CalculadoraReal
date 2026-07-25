@@ -14,6 +14,7 @@ const {
   requireAuth, requireActiveSubscription,
 } = require('./auth');
 const asaas = require('./billing/asaas');
+const appHtml = require('./private/app.js'); // conteudo da calculadora embutido no bundle (ver private/app.js)
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -88,7 +89,7 @@ app.get('/api/auth/me', ah(async (req, res) => {
 // APP protegido (a calculadora) — so serve o HTML se autenticado + assinatura/trial ok
 // ------------------------------------------------------------
 app.get('/app', requireAuth, requireActiveSubscription(db), (req, res) => {
-  res.sendFile(path.join(__dirname, 'private', 'app.html'));
+  res.type('html').send(appHtml);
 });
 
 // ------------------------------------------------------------
@@ -191,6 +192,9 @@ app.post('/api/billing/subscribe', requireAuth, ah(async (req, res) => {
       const customer = await asaas.createCustomer({ name: user.nome || user.email, email: user.email, cpfCnpj });
       customerId = customer.id;
       await db.run('UPDATE users SET asaas_customer_id = $1 WHERE id = $2', [customerId, user.id]);
+    } else {
+      // cliente Asaas ja existia (ex: tentativa anterior) — garante que o CPF/CNPJ esteja preenchido nele
+      await asaas.updateCustomerCpfCnpj(customerId, cpfCnpj);
     }
     const subscription = await asaas.createSubscription(customerId);
     await db.run('UPDATE users SET asaas_subscription_id = $1 WHERE id = $2', [subscription.id, user.id]);
